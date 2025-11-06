@@ -1,9 +1,9 @@
 package org.example.be_elms.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.be_elms.dto.EmployeeDto;
 import org.example.be_elms.dto.LoginRequest;
 import org.example.be_elms.dto.LoginResponse;
+import org.example.be_elms.dto.UserInfoDto;
 import org.example.be_elms.exception.ResourceNotFoundException;
 import org.example.be_elms.exception.UnauthorizedException;
 import org.example.be_elms.model.entity.Employee;
@@ -40,18 +40,15 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public EmployeeDto getUserInfo(Integer employeeId) {
+    public UserInfoDto getUserInfo(Integer employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
 
-        return new EmployeeDto(
-                employee.getId(),
+        return new UserInfoDto(
                 employee.getEmployeeIdCode(),
                 employee.getUsername(),
                 employee.getFullName(),
                 employee.getRole(),
-                employee.getAnnualLeaveEntitlement(),
-                employee.getAccumulatedLeaveDays(),
                 employee.getPosition(),
                 employee.getDepartment()
         );

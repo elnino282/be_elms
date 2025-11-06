@@ -3,9 +3,9 @@ package org.example.be_elms.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.be_elms.dto.ApiResponse;
-import org.example.be_elms.dto.EmployeeDto;
 import org.example.be_elms.dto.LoginRequest;
 import org.example.be_elms.dto.LoginResponse;
+import org.example.be_elms.dto.UserInfoDto;
 import org.example.be_elms.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +25,8 @@ public class AuthController {
     }
 
     @GetMapping("/userinfo")
-    public ResponseEntity<ApiResponse<EmployeeDto>> getUserInfo(@RequestParam Integer employeeId) {
-        EmployeeDto userInfo = authService.getUserInfo(employeeId);
+    public ResponseEntity<ApiResponse<UserInfoDto>> getUserInfo(@RequestParam Integer employeeId) {
+        UserInfoDto userInfo = authService.getUserInfo(employeeId);
         return ResponseEntity.ok(ApiResponse.success("User info retrieved successfully", userInfo));
     }
 }
