@@ -24,15 +24,15 @@ public class LeaveRequestController {
      * Create a new leave request
      * EMPLOYEE role - creates request for themselves
      * 
-     * @param employeeId - Employee ID passed as request parameter or from auth context
+     * @param employeeIdCode - Employee ID code passed as request parameter or from auth context
      * @param dto - Leave request details
      */
     @PostMapping
     public ResponseEntity<ApiResponse<LeaveRequestDto>> createLeaveRequest(
-            @RequestParam Integer employeeId,
+            @RequestParam String employeeIdCode,
             @Valid @RequestBody CreateLeaveRequestDto dto) {
         
-        LeaveRequestDto result = leaveRequestService.createLeaveRequest(employeeId, dto);
+        LeaveRequestDto result = leaveRequestService.createLeaveRequest(employeeIdCode, dto);
         return ResponseEntity.ok(ApiResponse.success("Leave request created successfully", result));
     }
     
@@ -42,9 +42,9 @@ public class LeaveRequestController {
      */
     @GetMapping("/my-requests")
     public ResponseEntity<ApiResponse<List<LeaveRequestDto>>> getMyRequests(
-            @RequestParam Integer employeeId) {
+            @RequestParam String employeeIdCode) {
         
-        List<LeaveRequestDto> requests = leaveRequestService.getEmployeeRequests(employeeId);
+        List<LeaveRequestDto> requests = leaveRequestService.getEmployeeRequests(employeeIdCode);
         return ResponseEntity.ok(ApiResponse.success(requests));
     }
     

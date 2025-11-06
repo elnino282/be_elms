@@ -16,7 +16,9 @@ import org.example.be_elms.repository.LeaveRequestRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +31,10 @@ public class LeaveRequestService {
     private final LeaveBalanceService leaveBalanceService;
     
     @Transactional
-    public LeaveRequestDto createLeaveRequest(Integer employeeId, CreateLeaveRequestDto dto) {
-        Employee employee = employeeRepository.findById(employeeId)
+    public LeaveRequestDto createLeaveRequest(String employeeIdCode, CreateLeaveRequestDto dto) {
+        Employee employee = employeeRepository.findByEmployeeIdCode(employeeIdCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
+        Integer employeeId = employee.getId();
         
         // Validate dates
         if (dto.getEndDate().isBefore(dto.getStartDate())) {
@@ -75,8 +78,8 @@ public class LeaveRequestService {
     }
     
     @Transactional(readOnly = true)
-    public List<LeaveRequestDto> getEmployeeRequests(Integer employeeId) {
-        Employee employee = employeeRepository.findById(employeeId)
+    public List<LeaveRequestDto> getEmployeeRequests(String employeeIdCode) {
+        Employee employee = employeeRepository.findByEmployeeIdCode(employeeIdCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
         
         List<LeaveRequest> requests = leaveRequestRepository.findByEmployeeOrderByCreatedAtDesc(employee);
@@ -174,6 +177,24 @@ public class LeaveRequestService {
         dto.setTotalDays(request.getTotalDays());
         dto.setCreatedAt(request.getCreatedAt());
         dto.setDecidedAt(request.getDecidedAt());
+        
+        // Set position and department from Employee
+        dto.setPosition(request.getEmployee().getPosition());
+        dto.setDepartment(request.getEmployee().getDepartment());
+        
+        // Format dateOfRequest from createdAt: "MM/dd/yyyy - HH:mm"
+        if (request.getCreatedAt() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy - HH:mm");
+            LocalDateTime localDateTime = request.getCreatedAt().toLocalDateTime();
+            dto.setDateOfRequest(localDateTime.format(formatter));
+        }
+        
+        // Format totalDaysTaken: "XX/YY days"
+        Integer totalDays = request.getTotalDays();
+        Integer annualLeaveEntitlement = request.getEmployee().getAnnualLeaveEntitlement();
+        if (totalDays != null && annualLeaveEntitlement != null) {
+            dto.setTotalDaysTaken(String.format("%02d/%d days", totalDays, annualLeaveEntitlement));
+        }
         
         if (request.getApprovedBy() != null) {
             dto.setApprovedById(request.getApprovedBy().getId());

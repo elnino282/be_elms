@@ -25,5 +25,9 @@ public class LeaveRequestDto {
     private OffsetDateTime decidedAt;
     private Integer totalDays;
     private OffsetDateTime createdAt;
+    private String position;
+    private String department;
+    private String dateOfRequest;
+    private String totalDaysTaken;
 }
 
